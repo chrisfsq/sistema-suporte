@@ -41,8 +41,8 @@
                         
                         <p class="card-text"><small class="text-muted">Por <strong><%= question.name %></strong> em: <br> <%= new Date(question.createdAt).toLocaleString('pt-BR') %></small></p>
 
-                        <div class="card-footer d-flex justify-content-around">
-                            <p class="card-text"><small class="text-muted">Quantidade de intereções: <strong> <%= question.responseCount %> </strong></small></p>
+                        <div class="card-footer d-flex justify-content-between">
+                            <p class="card-text"><small class="text-muted">Intereções: <strong> <%= question.responseCount %> </strong></small></p>
                            <a href="/question/<%= question.id %>"><button class="btn btn-success">INTERAGIR</button></a>
                            
                         </div>
