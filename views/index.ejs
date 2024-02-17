@@ -5,7 +5,7 @@
 
             <div class="container">
                 <hr>
-                <h1 class="d-flex justify-content-around">Perguntas <a href="/question" class="btn btn-warning">Deixe seu dúvida</a></h1>
+                <h1 class="d-flex justify-content-around">Dúvidas em aberto: <a href="/question" class="btn btn-warning">Deixe seu dúvida</a></h1>
                 <hr>
                 
                 <% question.forEach(question=> { %>
@@ -25,19 +25,33 @@
                         </div>
 
                         <div class="card-text">
-                            <img style="max-width: 300px;" src="/uploads/<%= question.image %>" alt="Imagem da questão">
+                            <img class="questionImage" style="max-width: 300px; cursor: pointer;" src="/uploads/<%= question.image %>" alt="Imagem da questão" data-toggle="modal" data-target="#imageModal">
                         </div>
-
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img id="expandedImage" style="width: 100%;" alt="Imagem expandida">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <p class="card-text"><small class="text-muted">Por <strong><%= question.name %></strong> em: <br> <%= new Date(question.createdAt).toLocaleString('pt-BR') %></small></p>
 
-                        <div class="card-footer ">
-                            <button class="btn btn-success">Responder</button>
+                        <div class="card-footer d-flex justify-content-around">
+                            <p class="card-text"><small class="text-muted">Quantidade de intereções: <strong> <%= question.responseCount %> </strong></small></p>
+                           <a href="/question/<%= question.id %>"><button class="btn btn-success">INTERAGIR</button></a>
+                           
                         </div>
                     </div>
 
                 </div>
                     <% }) %>
             </div>
+            <%- include ('partials/footer.ejs') %>
     </body>
 
     </html>

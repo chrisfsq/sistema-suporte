@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const multer = require('multer');
+const Response = require('./db/Response')
 
 const path = require('path'); //importa //GUARDA O DIRETORIO ONDE FICAM OS ARQUIVOS ESTATICOS COMO "INAGEM" E "ESTILOS"
 app.use(express.static(path.join(__dirname, 'public')));
@@ -33,14 +34,28 @@ app.set('view engine', 'ejs');
 
 
 //RENDERIZA A VIEW 'index.ejs'
-app.get("/", (req, res) => { //raw: true renderiza somente as perguntas?
-    Questions.findAll({ raw: true, order:[['id', 'DESC']] }) //ORDENA O REGISTRO DA DB POR ID DO MAIOR PARA MENOR (ASC = MENOR PARA MAIOR)
-    .then(question => { //MESMA COISA QUE "SELECT * FROM question"
-        console.log(question);
-        res.render("index", { //EVNVIA PARA O FRONT
-            question: question
+app.get("/", (req, res) => {
+    Questions.findAll({ raw: true, order: [['id', 'DESC']] })
+        .then(questions => {
+            // Itera sobre cada pergunta para contar o número de respostas associadas a ela
+            Promise.all(questions.map(question => {
+                return Response.count({
+                    where: { questionId: question.id }
+                }).then(count => {
+                    question.responseCount = count; // Adiciona a contagem de respostas à pergunta
+                    return question;
+                });
+            })).then(questionsWithCount => {
+                console.log(questionsWithCount);
+                res.render("index", {
+                    question: questionsWithCount
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao recuperar perguntas:', error);
+            res.status(500).send('Erro ao recuperar perguntas');
         });
-    })
 });
 
 
@@ -56,22 +71,58 @@ app.post("/send", upload.single('image'), (req, res) => {
     const title = req.body.title;
     const textarea = req.body.textarea;
 
-    if(req.file){
-    const image = req.file.filename;
-    
+    if (req.file) {
+        const image = req.file.filename;
 
-    //INSERE ECRIA O FORMULARIO NO BANCO DE DADOS(MESMA COISA QUE "INSERT INTO database")
-    Questions.create({
-        name: name,
-        title: title,
-        textarea: textarea,
-        image: image
-    }).then(() => { //then
-        res.redirect("/"); //REDIRECIONA PARA O INICIO SE TUDO ESTIVER OK!
-    });
+
+        //INSERE ECRIA O FORMULARIO NO BANCO DE DADOS(MESMA COISA QUE "INSERT INTO database")
+        Questions.create({
+            name: name,
+            title: title,
+            textarea: textarea,
+            image: image
+        }).then(() => { //then
+            res.redirect("/"); //REDIRECIONA PARA O INICIO SE TUDO ESTIVER OK!
+        });
     };
-})
+});
 
+app.get("/question/:id", (req, res) => { //PROCURA A QUESTAO PELO ID
+    const id = req.params.id;
+    Questions.findOne({ //MESMO QUE SELECT * FROM question WHERE id = :id;
+        where: { id: id }
+    }).then(question => {
+        if (question != undefined) {
+
+            Response.findAll({
+                where: {questionId: question.id},
+                order: [
+                    ['id', 'DESC']
+                ]
+            }).then(responses => {
+                res.render("find", {
+                    question: question,
+                    responses: responses
+                });
+            })
+        } else {
+            res.redirect("/")
+        }
+    });
+});
+
+app.post("/response", (req, res) => {
+    const corpo = req.body.corpo;
+    const questionId = req.body.questionId;
+    const resName = req.body.resName;
+    Response.create({
+        resName: resName,
+        corpo: corpo,
+        questionId: questionId
+    }).then(() => {
+        res.redirect("/question/" + questionId)
+    })
+})
 
 app.listen(3000, () => {
     console.log("Server running")

@@ -1,0 +1,65 @@
+<%- include ('partials/header.ejs') %>
+
+    <body>
+        <%- include ('partials/navbar.ejs') %>
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <%= question.title %>
+                </h4>
+            </div>
+            <div class="card-body">
+            
+            <div class="card-text">
+                <p>
+                    <%= question.textarea %>
+                </p>
+            </div>
+
+            <div class="card-text">
+                <img class="questionImage" style="max-width: 300px; cursor: pointer;" src="/uploads/<%= question.image %>" alt="Imagem da questão" data-toggle="modal" data-target="#imageModal">
+            </div>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img id="expandedImage" style="width: 100%;" alt="Imagem expandida">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <p class="card-text"><small class="text-muted">Por <strong><%= question.name %></strong> em: <br> <%= new Date(question.createdAt).toLocaleString('pt-BR') %></small></p>
+                <hr>
+                <form method="POST" action="/response">
+                    <h3>Responder:</h3>
+                    <br>
+                    <input type="text" placeholder="Seu nome" name="resName" class="form-control">
+                    <br>
+                    <textarea name="corpo" id="corpo" cols="30" rows="10" class="form-control" placeholder="Sua resposta"></textarea>
+                    <br>
+                    <input type="hidden" name="questionId" value="<%= question.id %>">
+                    <button type="submit" class="btn btn-primary">RESPONDER</button>
+                    <hr>
+                    <h3>Respostas:</h3>
+                    <hr>
+                    <% responses.forEach(response=> {%>
+                    
+                        <br>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>
+                                    <%= response.corpo %>
+                                </p>
+                                <p class="card-text"><small class="text-muted">Respondido por: <strong><%= response.resName %></strong> em: <br> <%= new Date(question.createdAt).toLocaleString('pt-BR') %></small></p>
+                            </div>
+                        </div>
+                        <% }) %>
+
+                </form>
+            </div>
+            <%- include ('partials/footer.ejs') %>
+    </body>
