@@ -25,9 +25,10 @@
                         </div>
 
                         <div class="card-text">
-                            <img class="questionImage" style="max-width: 300px; cursor: pointer;" src="/uploads/<%= question.image %>" alt="Imagem da questão" data-toggle="modal" data-target="#imageModal">
+                            <% if (question.image) { %>
+                                <img class="questionImage" style="max-width: 300px; cursor: pointer;" src="/uploads/<%= question.image %>" alt="Imagem da questão" data-toggle="modal" data-target="#imageModal">
+                            <% } %>
                         </div>
-                        
                         <!-- Modal -->
                         <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">

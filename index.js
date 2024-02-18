@@ -70,10 +70,10 @@ app.post("/send", upload.single('image'), (req, res) => {
     const name = req.body.name;
     const title = req.body.title;
     const textarea = req.body.textarea;
-
+    let image = null;
     if (req.file) {
-        const image = req.file.filename;
-
+        image = req.file.filename;
+    };
 
         //INSERE ECRIA O FORMULARIO NO BANCO DE DADOS(MESMA COISA QUE "INSERT INTO database")
         Questions.create({
@@ -84,7 +84,7 @@ app.post("/send", upload.single('image'), (req, res) => {
         }).then(() => { //then
             res.redirect("/"); //REDIRECIONA PARA O INICIO SE TUDO ESTIVER OK!
         });
-    };
+
 });
 
 app.get("/question/:id", (req, res) => { //PROCURA A QUESTAO PELO ID
